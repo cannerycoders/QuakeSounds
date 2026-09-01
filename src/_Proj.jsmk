@@ -1,0 +1,32 @@
+//
+//
+//
+
+Project.EstablishDomain("rumble", /wemos/);
+
+let m = Project.NewModule("rumble");
+let t1 = m.NewTask("compile", "cpp->o", {
+            inputs: Project.Glob("*.cpp"),
+            searchpaths: [].concat(
+                Project.FindModule("libwifi").Interpolate("${INCDIR}"),
+                Project.FindModule("libticker").Interpolate("${INCDIR}")
+                      )
+            });
+
+let t2 = m.NewTask("rumble", "cpp.o->elf", {
+            inputs: [].concat(t1.GetOutputs(),
+                        Project.FindModuleOutputs("libwifi"),
+                        Project.FindModuleOutputs("libticker"),
+                        Project.FindModuleOutputs("libcore")),
+            searchpaths: [
+                    Project.FindModule("libwifi").Interpolate("${INCDIR}"),
+                ]
+            });
+
+let t3 = m.NewTask("esptool", "elf->bin", {
+                inputs: t2.GetOutputs()
+            });
+
+let t4 = m.NewTask("esptool", "flash", {
+                inputs: t3.GetOutputs()
+            });

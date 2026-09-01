@@ -1,0 +1,461 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1788290792000,
+    "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson",
+    "title": "USGS All Earthquakes, Past Hour",
+    "status": 200,
+    "api": "2.7.0",
+    "count": 11
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.03220648132381,
+        "place": "5 km SE of Ontario, CA",
+        "time": 1788290590500,
+        "updated": 1788290714971,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci41540248",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci41540248.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 16,
+        "net": "ci",
+        "code": "41540248",
+        "ids": ",ci41540248,",
+        "sources": ",ci,",
+        "types": ",nearby-cities,origin,phase-data,",
+        "nst": 19,
+        "dmin": 0.02635,
+        "rms": 0.0900000036,
+        "gap": 85,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.0 - 5 km SE of Ontario, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.585830688477,
+          34.0216674804688,
+          4.92999982833862
+        ]
+      },
+      "id": "ci41540248"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.6,
+        "place": "54 km W of Cantwell, Alaska",
+        "time": 1788289887803,
+        "updated": 1788289982146,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/aka2026rihsmo",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/aka2026rihsmo.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 39,
+        "net": "ak",
+        "code": "a2026rihsmo",
+        "ids": ",aka2026rihsmo,",
+        "sources": ",ak,",
+        "types": ",origin,phase-data,",
+        "nst": 36,
+        "dmin": 0.5,
+        "rms": 0.6,
+        "gap": 42,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.6 - 54 km W of Cantwell, Alaska"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -150.033,
+          63.327,
+          107.4
+        ]
+      },
+      "id": "aka2026rihsmo"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.1,
+        "place": "65 km WSW of Anchor Point, Alaska",
+        "time": 1788289128588,
+        "updated": 1788289292504,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/aka2026rihhqe",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/aka2026rihhqe.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 68,
+        "net": "ak",
+        "code": "a2026rihhqe",
+        "ids": ",aka2026rihhqe,",
+        "sources": ",ak,",
+        "types": ",origin,phase-data,",
+        "nst": 78,
+        "dmin": 0.1,
+        "rms": 0.6,
+        "gap": 80,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.1 - 65 km WSW of Anchor Point, Alaska"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -152.962,
+          59.643,
+          111.4
+        ]
+      },
+      "id": "aka2026rihhqe"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.48,
+        "place": "9 km ENE of Lebec, CA",
+        "time": 1788288784990,
+        "updated": 1788289437930,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci41540232",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci41540232.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 34,
+        "net": "ci",
+        "code": "41540232",
+        "ids": ",ci41540232,",
+        "sources": ",ci,",
+        "types": ",focal-mechanism,nearby-cities,origin,phase-data,scitech-link,",
+        "nst": 52,
+        "dmin": 0.08854,
+        "rms": 0.17,
+        "gap": 57,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 1.5 - 9 km ENE of Lebec, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.7705,
+          34.8656666666667,
+          10.3
+        ]
+      },
+      "id": "ci41540232"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 0.85,
+        "place": "12 km W of Anza, CA",
+        "time": 1788288700650,
+        "updated": 1788288904194,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci41540224",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/ci41540224.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 11,
+        "net": "ci",
+        "code": "41540224",
+        "ids": ",ci41540224,",
+        "sources": ",ci,",
+        "types": ",nearby-cities,origin,phase-data,",
+        "nst": 39,
+        "dmin": 0.03919,
+        "rms": 0.16,
+        "gap": 35,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 0.9 - 12 km W of Anza, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -116.802,
+          33.5705,
+          7.83
+        ]
+      },
+      "id": "ci41540224"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 4.4,
+        "place": "33 km ESE of Farkhār, Afghanistan",
+        "time": 1788288666927,
+        "updated": 1788289749040,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000tdf1",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us7000tdf1.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 298,
+        "net": "us",
+        "code": "7000tdf1",
+        "ids": ",us7000tdf1,",
+        "sources": ",us,",
+        "types": ",origin,phase-data,",
+        "nst": 59,
+        "dmin": 2.127,
+        "rms": 0.67,
+        "gap": 67,
+        "magType": "mb",
+        "type": "earthquake",
+        "title": "M 4.4 - 33 km ESE of Farkhār, Afghanistan"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          70.2048,
+          36.4587,
+          212.598
+        ]
+      },
+      "id": "us7000tdf1"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.09,
+        "place": "16 km NE of Milford, Utah",
+        "time": 1788288328330,
+        "updated": 1788289179770,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/uu80153251",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/uu80153251.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 67,
+        "net": "uu",
+        "code": "80153251",
+        "ids": ",uu80153251,",
+        "sources": ",uu,",
+        "types": ",origin,phase-data,",
+        "nst": 20,
+        "dmin": 0.00829,
+        "rms": 0.11,
+        "gap": 48,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.1 - 16 km NE of Milford, Utah"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.897666666667,
+          38.5185,
+          1.68
+        ]
+      },
+      "id": "uu80153251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 1.16,
+        "place": "16 km NE of Milford, Utah",
+        "time": 1788287883600,
+        "updated": 1788289640480,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/uu80153246",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/uu80153246.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 21,
+        "net": "uu",
+        "code": "80153246",
+        "ids": ",uu80153246,",
+        "sources": ",uu,",
+        "types": ",origin,phase-data,",
+        "nst": 10,
+        "dmin": 0.006674,
+        "rms": 0.05,
+        "gap": 112,
+        "magType": "md",
+        "type": "earthquake",
+        "title": "M 1.2 - 16 km NE of Milford, Utah"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.892,
+          38.515,
+          2.87
+        ]
+      },
+      "id": "uu80153246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 5,
+        "place": "118 km SSE of Isangel, Vanuatu",
+        "time": 1788287849222,
+        "updated": 1788288869040,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000tdey",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us7000tdey.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "reviewed",
+        "tsunami": 0,
+        "sig": 385,
+        "net": "us",
+        "code": "7000tdey",
+        "ids": ",us7000tdey,",
+        "sources": ",us,",
+        "types": ",origin,phase-data,",
+        "nst": 79,
+        "dmin": 3.023,
+        "rms": 1.23,
+        "gap": 54,
+        "magType": "mb",
+        "type": "earthquake",
+        "title": "M 5.0 - 118 km SSE of Isangel, Vanuatu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          169.7829,
+          -20.5024,
+          122.461
+        ]
+      },
+      "id": "us7000tdey"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2.3,
+        "place": "88 km E of King Salmon, Alaska",
+        "time": 1788287665905,
+        "updated": 1788287901592,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/aka2026rigmiv",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/aka2026rigmiv.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 81,
+        "net": "ak",
+        "code": "a2026rigmiv",
+        "ids": ",aka2026rigmiv,",
+        "sources": ",ak,",
+        "types": ",origin,phase-data,",
+        "nst": 80,
+        "dmin": 0.1,
+        "rms": 0.7,
+        "gap": 64,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.3 - 88 km E of King Salmon, Alaska"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.143,
+          58.63,
+          139.6
+        ]
+      },
+      "id": "aka2026rigmiv"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "mag": 2,
+        "place": "13 km SSW of Falls City, Texas",
+        "time": 1788287208375,
+        "updated": 1788287355470,
+        "tz": null,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/tx2026rfmdqm",
+        "detail": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/tx2026rfmdqm.geojson",
+        "felt": null,
+        "cdi": null,
+        "mmi": null,
+        "alert": null,
+        "status": "automatic",
+        "tsunami": 0,
+        "sig": 62,
+        "net": "tx",
+        "code": "2026rfmdqm",
+        "ids": ",tx2026rfmdqm,",
+        "sources": ",tx,",
+        "types": ",origin,phase-data,",
+        "nst": 11,
+        "dmin": 0.1,
+        "rms": 0.5,
+        "gap": 112,
+        "magType": "ml",
+        "type": "earthquake",
+        "title": "M 2.0 - 13 km SSW of Falls City, Texas"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.082,
+          28.873,
+          4.8608
+        ]
+      },
+      "id": "tx2026rfmdqm"
+    }
+  ],
+  "bbox": [
+    -155.143,
+    -20.5024,
+    1.68,
+    169.7829,
+    63.327,
+    212.598
+  ]
+}

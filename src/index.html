@@ -1,0 +1,29 @@
+<head>
+  <style> 
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+  }
+  #globeViz {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  </style>
+
+  <script type="importmap">{ "imports": {
+    "three": "https://esm.sh/three",
+    "three/": "https://esm.sh/three/",
+    "three-globe": "https://esm.sh/three-globe?external=three"
+  }}</script>
+
+</head>
+
+<body>
+  <div id="globeViz"></div>
+  <script type="module" src="./index.js"></script>
+
+</body>

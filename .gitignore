@@ -1,0 +1,16 @@
+node_modules/*
+*/node_modules/*
+_built/
+_prebuilt/
+_install/
+_package/
+_output/
+**/_dist/
+repo/
+*/_built/
+*/_install/
+*/_released/
+.ignore/
+.DS_Store
+build.json
+searchIndex.json
