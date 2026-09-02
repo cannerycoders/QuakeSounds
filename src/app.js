@@ -9,9 +9,10 @@ export class App
     this.TrackballControls = TrackballControls;
 
     this.initGlobe();
+    this.quakeInfo = document.getElementById("quakeInfo");
     this.rumble = new Rumble(this.globe, 
                   this.THREE, this.camera, 
-                  this.trackball);
+                  this.trackball, this.quakeInfo);
 
     this.redrawCB = this.redraw.bind(this);
     this.redraw();

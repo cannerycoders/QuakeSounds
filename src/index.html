@@ -12,6 +12,31 @@
     height: 100%;
     overflow: hidden;
   }
+  #quakeInfo {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border-radius: 10px;
+    max-width: 220px;
+    max-height: 100%;
+    overflow-y: auto;
+    background-color: rgb(57, 57, 146, 27%);
+  }
+  table {
+    color: #aaa;
+    border-width: thin;
+    border-color: #125;
+    border-style: solid;
+    padding: 5px;
+    font-size: .6em;
+    font-family:sans-serif;
+  }
+  th {
+    text-align: left;
+  }
+  a {
+    color: rgb(245, 232, 209);
+  }
   </style>
 
   <script type="importmap">{ "imports": {
@@ -24,6 +49,7 @@
 
 <body>
   <div id="globeViz"></div>
+  <div id="quakeInfo"></div>
   <script type="module" src="./index.js"></script>
 
 </body>

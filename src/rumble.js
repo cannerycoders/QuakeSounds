@@ -1,6 +1,6 @@
 export class Rumble
 {
-  constructor(globe, three, camera, trackball)
+  constructor(globe, three, camera, trackball, infodiv)
   {
     this.URLS = 
     {
@@ -20,6 +20,7 @@ export class Rumble
     this.three = three;
     this.camera = camera;
     this.trackball = trackball;
+    this.infodiv = infodiv;
     this.globe
     .ringMaxRadius('maxR')
     .ringPropagationSpeed('propagationSpeed')
@@ -60,6 +61,7 @@ export class Rumble
     if(arrived)
     {
       const now = Date.now();
+      let html = ["<table><tr><th>Location</th><th>Mag</th><th>Time</th></tr>"];
       this.activeQuakes.filter((q) => 
       {
         let delta = now - q.staleTime;
@@ -68,10 +70,28 @@ export class Rumble
         {
           console.log(`${q.event.properties.place} stale ${q.time} ${delta/1000}`);
         }
+        else
+        {
+          let loc =`<a id='${q.lat}_${q.lng}' href=''>${q.event.properties.place}</a>`;
+          let time = q.time;
+          let mag = q.event.properties.mag.toFixed(1);
+          html.push(`<tr><td>${loc}</td><td>${mag}</td><td>${time}</td></tr>`);
+        }
         return live;
       });
+      html.push("</table>")
+      this.infodiv.innerHTML = html.join("");
+      for(let el of this.infodiv.querySelectorAll("a"))
+      {
+        el.onclick = (evt) =>
+        {
+          let [lat, lng] = el.id.split("_");
+          this.flyTo(lat, lng);
+          evt.preventDefault();
+        };
+      }
+
       this.globe.ringsData(this.activeQuakes);
-      // flyTo
     }
   }
 
@@ -96,7 +116,7 @@ export class Rumble
     this.activeQuakes.push(
     {
       event, 
-      time: quakeDate.toLocaleString(),
+      time: quakeDate.toLocaleTimeString(),
       quakeTime,
       staleTime,
       hue: this.sigToHue(event.properties.sig),
@@ -143,7 +163,7 @@ export class Rumble
     return scale * 7.2 * Math.pow(2, magnitude - 7);
   }
 
-  magDepthToRadiusDegrees(magnitude, depthKm, scale=10)
+  magDepthToRadiusDegrees(magnitude, depthKm, scale=5)
   {
     const earthCircumferenceMiles = 24901;
     const radiusAtM7Miles = 500;
@@ -157,11 +177,13 @@ export class Rumble
     // surface influence.
     const depthFactor = 1 / Math.sqrt(1 + depthKm / 20);
     const radiusMiles = magnitudeRadius * depthFactor;
-    return scale * radiusMiles * 360 / earthCircumferenceMiles;
+    return Math.max(2, scale * radiusMiles * 360 / earthCircumferenceMiles);
   }
 
-  flyTo(globe, three, camera, lat, lng, duration = 1000)
+  flyTo(lat, lng, duration = 1000)
   {
+    let {globe, camera, three} = this;
+    console.log(`flyto: ${lat} ${lng}`);
     const p = globe.getCoords(lat, lng, 1);
     const target = new three.Vector3(p.x, p.y, p.z).normalize();
     const cameraDirection = camera.position.clone().normalize();
@@ -169,7 +191,7 @@ export class Rumble
     const worldTarget = target.clone().applyQuaternion(globe.quaternion);
 
     // Rotation axis for the shortest great-circle rotation.
-    const axis = new THREE.Vector3().crossVectors(worldTarget, cameraDirection);
+    const axis = new three.Vector3().crossVectors(worldTarget, cameraDirection);
     const axisLength = axis.length();
 
     // Already centered.
@@ -190,7 +212,7 @@ export class Rumble
       // Smoothstep.
       const s = t * t * (3 - 2 * t);
 
-      const rotation = new THREE.Quaternion().setFromAxisAngle(axis, angle * s);
+      const rotation = new three.Quaternion().setFromAxisAngle(axis, angle * s);
 
       globe.quaternion.copy(startQuaternion).premultiply(rotation);
 
