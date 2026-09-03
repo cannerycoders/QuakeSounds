@@ -14,57 +14,45 @@ export class HzBridge extends HzEventHub
   {
     super();
     this.iframeDiv = div;
-    this.iframeDiv.innerHTML = `
-    <iframe tabindex="10" sandbox="allow-same-origin allow-scripts"></iframe>
-    `;
-    this.iframe = this.iframeDiv.querySelector("iframe");
-    this.iframe.src = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html";
-    this.sbWin = this.iframe.contentWindow;
-    this.content = this.sbWin.document.querySelector(".Content");
     this.sandboxes = [];
 
-    window.addEventListener("message", evt => 
+    this.iframeDiv.innerHTML = `
+    <iframe style="border-style:none" tabindex="10" sandbox="allow-same-origin allow-scripts"></iframe>
+    `;
+
+    this.iframe = this.iframeDiv.querySelector("iframe");
+    this.iframe.addEventListener("load", () =>
     {
-      if (evt.origin != window.location.origin)
-      {
-        console.warn("Unexpected message source " + evt.origin);
-        return;
-      }
-      switch (evt.data.type)
-      {
-      case "sbReady":
-        {
-          let sbId = evt.data.sbId;
-          let sbCtx = this.sandboxes[sbId];
-          if (!sbCtx)
-            console.warn("SandboxMgr received ready from an unknown sandbox:" + sbId);
-          else
-            sbCtx.initComms();
-        }
-        break;
-      }
+      this.newSandbox();
+      // nb; we can't access sandbox content directly
     });
-    this.newSandbox();
+
+    // this.iframe.src = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html?sbId=0";
+    this.iframe.src = "http://localhost:8081/sandbox/index.html?sbId=0";
+    this.sbWin = this.iframe.contentWindow;
+
   }
 
+  EvalScript(scriptContent)
+  {
+    const mode = "async";
+    let type = "runscript";
+    let payload = {content: scriptContent, mode};
+    let sbIndex = 0;
+    let sb = this.sandboxes[sbIndex];
+    sb.send(type, payload);
+  }
+
+  /* ------------------------------------------------------------- */
   newSandbox()
   {
     let sbid = this.sandboxes.length;
-    let ctx = new HzSbCtx(this, sbid, this.sbWin);
+    let ctx = new HzSbCtx(this, sbid, this.sbWin, () =>
+    {
+      this.Emit("HzReady");
+    });
     this.sandboxes.push(ctx);
-    this.Emit("sbCreate", sbid);
-    ctx.initComms();
-  }
-
-  initComms()
-  {
-    const msg = {
-      type: "init", 
-      sbId: this.sbId,
-      port: this.msgChannel.port2
-    };
-    // must transfer ownership of port2
-    this.sbWin.postMessage(msg, "*", [this.msgChannel.port2]);
+    ctx.InitComms();
   }
 
 }

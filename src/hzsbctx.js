@@ -1,43 +1,14 @@
-/** (shared with HzBridge)
- * Construct a uniform interface around a port associated 
-  * with a MessageChannel (port1 is host, port2 is sandbox). 
-  * NB: this function may be webpacked into sandbox code.
-  * @returns object with "send" and "on" methods.
-  */
-export function CreateStructuredPort(port) 
-{ 
-  const listeners = new Map();
-  port.onmessage = (e) => 
-  {
-    const {type, payload} = e.data;
-    if (listeners.has(type)) 
-      listeners.get(type)(payload);
-    else
-      console.log("Unknown IPC msg " + type);
-  };
-  return {
-  send(type, payload) 
-    {
-      port.postMessage({type, payload});
-    },
-    on(type, handler) 
-    {
-      listeners.set(type, handler);
-    }
-  };
-}
-
 /* ---------------------------------------------------------------- */
 export class HzSbCtx
 {
-  constructor(eventhub, sbId, sbWin)
+  constructor(eventhub, sbId, sbWin, onReady)
   {
     this.eventhub = eventhub;
     this.sbId = sbId;
     this.ready = false;
     this.sbWin = sbWin,
     this.msgChannel = new MessageChannel();;
-    this.msgPort = CreateStructuredPort(this.msgChannel.port1);
+    this.msgPort = this.createStructuredPort(this.msgChannel.port1);
     this.activeQueries = {};
     this.queryId = 0;
 
@@ -46,11 +17,9 @@ export class HzSbCtx
     {
       if (payload.id != this.sbId)
         console.warn(`SandboxMgr.ready botch ${payload.id} ${this.sbId}`);
-      if (this.pending != null)
+      if (onReady)
       {
-        this.send(this.pending.type, this.pending.payload, 
-                      this.pending.queryctx);
-        this.pending = null;
+        onReady(this.sbId, this.sbWin);
       }
     });
     this.on("emit", (payload) =>
@@ -136,22 +105,26 @@ export class HzSbCtx
     });
     // nb: we send init msg only after we receive "sbReady", above.
   }
+
   /** 
    * request MessageChannel init handshake via standard/global postMessage.
     * NB: this can only be done after sbWin is "ready", meaning that it
     * has installed its 'message' event listener AND is
     */
-  initComms()
+  InitComms()
   {
     const msg = {
       type: "init", 
       sbId: this.sbId,
-      port: this.msgChannel.port2
+      port: this.msgChannel.port2,
+      showActivate: true,
     };
     this.sbWin.postMessage(msg, "*",
       [this.msgChannel.port2] // must transfer ownership
     );
   }
+
+  /* ----------------------------------------------------------------- */
   send(type, payload, queryctx = null) 
   {
     if (type == "runquery")
@@ -170,5 +143,32 @@ export class HzSbCtx
     console.warn("HzSbCtx close?");
     if (!this.sbWin.closed) 
       this.sbWin.close();
+  }
+  /* Construct a uniform interface around a port associated 
+    * with a MessageChannel (port1 is host, port2 is sandbox). 
+    * NB: this function may be webpacked into sandbox code.
+    * @returns object with "send" and "on" methods.
+    */
+  createStructuredPort(port) 
+  { 
+    const listeners = new Map();
+    port.onmessage = (e) => 
+    {
+      const {type, payload} = e.data;
+      if (listeners.has(type)) 
+        listeners.get(type)(payload);
+      else
+        console.log("Unknown IPC msg " + type);
+    };
+    return {
+      send(type, payload) 
+      {
+        port.postMessage({type, payload});
+      },
+      on(type, handler) 
+      {
+        listeners.set(type, handler);
+      }
+    };
   }
 }

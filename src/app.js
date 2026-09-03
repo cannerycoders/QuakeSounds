@@ -1,6 +1,42 @@
 import {Rumble} from "./rumble.js";
 import { HzBridge } from "./hzbridge.js";
 
+const hzSoundScript = `
+let scene = await Ascene.BeginFiber(this);
+let dac = scene.GetDAC();
+dac.Show();
+
+let inst = await Anode.New("Hz.Noise", {
+  preset: {
+    Waveform: 1,
+    Gain: .3,
+    A: .5,
+    D: .01,
+    S: 1,
+    R: .5,
+  }});
+inst.Show();
+
+let scope = await Anode.New("Hz.Scope");
+scope.Show();
+
+let sscope = await Anode.New("Hz.SpectreScope");
+sscope.Show();
+
+scene.Chain(inst, scope, sscope, dac);
+
+const noteDur = scene.Seconds(1);
+for (let i = 0;i < 30;i++)
+{
+  inst.Note(i, Random.InRange(.5, 1), noteDur);
+  await scene.Wait(2 * noteDur);
+}
+`;
+
+const hzToggleScript = `
+globalThis.Aengine.ToggleState();
+`;
+
 export class App
 {
   constructor(THREE, ThreeGlobe, TrackballControls)
@@ -21,6 +57,19 @@ export class App
     this.redraw();
 
     window.App = this;
+
+    this.soundActivated = false;
+
+    this.hzbridge.On("HzSbActivate", (onoff) =>
+    {
+      if(this.soundActivated == false)
+      {
+        this.hzbridge.EvalScript(hzSoundScript);
+        this.soundActivated = true;
+      }
+      else
+        this.hzbridge.EvalScript(hzToggleScript);
+    });
   }
 
   async FetchLocalFile(fileref, filetype="text")
