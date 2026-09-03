@@ -1,9 +1,12 @@
 import {Rumble} from "./rumble.js";
+import { HzBridge } from "./hzbridge.js";
 
 export class App
 {
   constructor(THREE, ThreeGlobe, TrackballControls)
   {
+    this.hzbridge = new HzBridge(document.getElementById("hzbridge"));
+
     this.THREE = THREE;
     this.ThreeGlobe = ThreeGlobe;
     this.TrackballControls = TrackballControls;
@@ -16,6 +19,13 @@ export class App
 
     this.redrawCB = this.redraw.bind(this);
     this.redraw();
+
+    window.App = this;
+  }
+
+  async FetchLocalFile(fileref, filetype="text")
+  {
+    throw new Error("File not found " + fileref);
   }
 
   redraw()
