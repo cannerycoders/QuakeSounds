@@ -2,6 +2,12 @@ import {Rumble} from "./rumble.js";
 import { HzBridge } from "./hzbridge.js";
 
 const hzSoundScript = `
+const IPC = SandboxCtx.IPC;
+IPC.On("QuakeMsg", (msg) =>
+{
+  console.log("QuakeMsg: " + JSON.stringify(msg));
+});
+
 let scene = await Ascene.BeginFiber(this);
 let dac = scene.GetDAC();
 dac.Show();
@@ -64,12 +70,19 @@ export class App
     {
       if(this.soundActivated == false)
       {
+        this.onIdle();
         this.hzbridge.EvalScript(hzSoundScript);
         this.soundActivated = true;
       }
       else
         this.hzbridge.EvalScript(hzToggleScript);
     });
+  }
+
+  onIdle()
+  {
+    this.hzbridge.Notify("QuakeMsg", {msg: "idle", now: (new Date()).toISOString()});
+    setTimeout(this.onIdle.bind(this), 2000);
   }
 
   async FetchLocalFile(fileref, filetype="text")

@@ -43,6 +43,13 @@ export class HzBridge extends HzEventHub
     sb.send(type, payload);
   }
 
+  Notify(msg, payload)
+  {
+    let sbIndex = 0;
+    let sb = this.sandboxes[sbIndex];
+    sb.send(msg, payload);
+  }
+
   /* ------------------------------------------------------------- */
   newSandbox()
   {
