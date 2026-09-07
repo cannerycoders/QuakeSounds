@@ -8,6 +8,9 @@
 import {HzSbCtx} from "./hzsbctx.js";
 import {HzEventHub} from "./hzeventhub.js";
 
+const sbURL = "http://localhost:8081/sandbox/index.html?sbId=0";
+// const sbURL = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html?sbId=0";
+
 export class HzBridge extends HzEventHub
 {
   constructor(div)
@@ -27,10 +30,8 @@ export class HzBridge extends HzEventHub
       // nb; we can't access sandbox content directly
     });
 
-    // this.iframe.src = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html?sbId=0";
-    this.iframe.src = "http://localhost:8081/sandbox/index.html?sbId=0";
+    this.iframe.src = sbURL;
     this.sbWin = this.iframe.contentWindow;
-
   }
 
   EvalScript(scriptContent)
@@ -40,14 +41,14 @@ export class HzBridge extends HzEventHub
     let payload = {content: scriptContent, mode};
     let sbIndex = 0;
     let sb = this.sandboxes[sbIndex];
-    sb.send(type, payload);
+    sb.Send(type, payload);
   }
 
   Notify(msg, payload)
   {
     let sbIndex = 0;
     let sb = this.sandboxes[sbIndex];
-    sb.send(msg, payload);
+    sb.Send(msg, payload);
   }
 
   /* ------------------------------------------------------------- */

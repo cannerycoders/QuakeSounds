@@ -13,7 +13,7 @@ export class HzSbCtx
     this.queryId = 0;
 
     // first install our handlers -------------------
-    this.on("ready", (payload) =>
+    this.On("ready", (payload) =>
     {
       if (payload.id != this.sbId)
         console.warn(`SandboxMgr.ready botch ${payload.id} ${this.sbId}`);
@@ -22,15 +22,16 @@ export class HzSbCtx
         onReady(this.sbId, this.sbWin);
       }
     });
-    this.on("emit", (payload) =>
+    this.On("emit", (payload) => // notification from sandbox
     {
       this.eventhub.Emit(payload.emitId, payload.payload);
     });
-    this.on("log", (payload) =>
+    this.On("log", (payload) =>
     {
       console[payload.lev](payload.msg);
     });
-    this.on("queryresult", (payload) =>
+    // -------------------------------------------------------------
+    this.On("queryresult", (payload) =>
     {
       let {queryId, result, err} = payload;
       let {resolve, reject} = this.activeQueries[queryId];
@@ -45,11 +46,9 @@ export class HzSbCtx
         delete this.activeQueries[queryId];
       }
     });
-    this.on("localfetch", (payload) =>
+    this.On("localfetch", (payload) =>
     {
-      App.FetchLocalFile(payload.url, payload.filetype)
-        .then((contents) =>
-        {
+      App.FetchLocalFile(payload.url, payload.filetype) .then((contents) => {
           let text, buffer;
           if (payload.filetype == "arraybuffer")
             buffer = contents.buffer;
@@ -61,7 +60,30 @@ export class HzSbCtx
             text,
             buffer
           };
-          this.send("response", rpayload);
+          this.Send("response", rpayload);
+      })
+      .catch((err) =>
+      {
+        const rpayload = { 
+          reqId: payload.reqId, 
+          err,
+        };
+        this.Send("response", rpayload);
+      });
+    });
+    this.On("WSSave", (payload) =>
+    {
+      App.SaveWorkspaceFile(payload.url, 
+                  payload.data, 
+                  payload.filetype,
+                  payload.cfg)
+        .then(() =>
+        {
+          const rpayload = { 
+            reqId: payload.reqId, 
+            err: 0,
+          };
+          this.Send("response", rpayload);
         })
         .catch((err) =>
         {
@@ -69,48 +91,26 @@ export class HzSbCtx
             reqId: payload.reqId, 
             err,
           };
-          this.send("response", rpayload);
+          this.Send("response", rpayload);
         });
-      });
-      this.on("WSSave", (payload) =>
-      {
-        App.SaveWorkspaceFile(payload.url, 
-                  payload.data, 
-                  payload.filetype,
-                  payload.cfg)
-          .then(() =>
-          {
-            const rpayload = { 
-              reqId: payload.reqId, 
-              err: 0,
-            };
-            this.send("response", rpayload);
-          })
-          .catch((err) =>
-          {
-            const rpayload = { 
-              reqId: payload.reqId, 
-              err,
-            };
-            this.send("response", rpayload);
-          });
-      });
-      this.on("fibermgr/new", (payload) =>
-      {
-        this.eventhub.Emit("sbFiberStatus", this.sbId, payload);
     });
-    this.on("fibermgr/status", (payload) =>
+    this.On("fibermgr/new", (payload) =>
+    {
+      this.eventhub.Emit("sbFiberStatus", this.sbId, payload);
+    });
+    this.On("fibermgr/status", (payload) =>
     {
       this.eventhub.Emit("sbFiberStatus", this.sbId, payload);
     });
     // nb: we send init msg only after we receive "sbReady", above.
   }
 
+  /* ----------------------------------------------------------------- */
   /** 
    * request MessageChannel init handshake via standard/global postMessage.
-    * NB: this can only be done after sbWin is "ready", meaning that it
-    * has installed its 'message' event listener AND is
-    */
+   * NB: this can only be done after sbWin is "ready", meaning that it
+   * has installed its 'message' event listener AND is
+   */
   InitComms()
   {
     const msg = {
@@ -123,9 +123,7 @@ export class HzSbCtx
       [this.msgChannel.port2] // must transfer ownership
     );
   }
-
-  /* ----------------------------------------------------------------- */
-  send(type, payload, queryctx = null) 
+  Send(type, payload, queryctx = null) 
   {
     if (type == "runquery")
     {
@@ -134,16 +132,19 @@ export class HzSbCtx
     }
     this.msgPort.send(type, payload);
   }
-  on(type, handler)
+  On(type, handler)
   {
     this.msgPort.on(type, handler); 
   }
-  close()
+  Close()
   {
     console.warn("HzSbCtx close?");
     if (!this.sbWin.closed) 
       this.sbWin.close();
   }
+
+
+  /* ----------------------------------------------------------------- */
   /* Construct a uniform interface around a port associated 
     * with a MessageChannel (port1 is host, port2 is sandbox). 
     * NB: this function may be webpacked into sandbox code.

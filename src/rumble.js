@@ -1,7 +1,11 @@
-export class Rumble
+import {HzEventHub} from "./hzeventhub.js";
+
+export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
 {
   constructor(globe, three, camera, trackball, infodiv)
   {
+    super();
+
     this.URLS = 
     {
     significant:
@@ -27,11 +31,14 @@ export class Rumble
     .ringRepeatPeriod('repeatPeriod')
     .ringColor((q)=>
     {
-      return `hsla(${q.hue}, 100%, 50%, 1)`;
+      return t =>
+      {
+        return `hsla(${q.hue}, 100%, 50%, ${1-t})`;
+      }
     });
 
     this.knownQuakes = new Set(); // just ids, so no worries about clearing
-    this.activeQuakes = []; // list of active quakes, sorted newest to oldest
+    this.activeQuakes = []; // list of active quakes, sorted oldest to newest
     this.idleInterval = 60 * 1000 * 2; // 2 min
     this.onIdleCB = this.onIdle.bind(this);
     this.onIdle();
@@ -48,64 +55,78 @@ export class Rumble
     const response = await fetch(this.URLS.all);
     if(!response.ok) throw new Error(`USGS: HTTP ${response.status}`);
     const data = await response.json();
-    let arrived = false;
+    let newQuake = false;
+    let maxMag = 0;
     for(const event of data.features)
     {
       if(!this.knownQuakes.has(event.id))
       {
         this.knownQuakes.add(event.id);
-        this.earthquakeArrived(event);
-        arrived = true;
+        this.earthquakeArrived(event); // adds to activeQuakes
+        newQuake = true;
+        maxMag = Math.max(maxMag, event.properties.mag);
       }
     }
-    if(arrived)
-    {
-      const now = Date.now();
-      let html = ["<table><tr><th>Location</th><th>Mag</th><th>Time</th></tr>"];
-      this.activeQuakes.filter((q) => 
-      {
-        let delta = now - q.staleTime;
-        let live = delta <= 0;
-        if(!live)
-        {
-          console.log(`${q.event.properties.place} stale ${q.time} ${delta/1000}`);
-        }
-        else
-        {
-          let loc =`<a id='${q.lat}_${q.lng}' href=''>${q.event.properties.place}</a>`;
-          let time = q.time;
-          let mag = q.event.properties.mag.toFixed(1);
-          html.push(`<tr><td>${loc}</td><td>${mag}</td><td>${time}</td></tr>`);
-        }
-        return live;
-      });
-      html.push("</table>")
-      this.infodiv.innerHTML = html.join("");
-      for(let el of this.infodiv.querySelectorAll("a"))
-      {
-        el.onclick = (evt) =>
-        {
-          let [lat, lng] = el.id.split("_");
-          this.flyTo(lat, lng);
-          evt.preventDefault();
-        };
-      }
+    if(newQuake)
+      this.onNewQuake(maxMag);
+  }
 
-      this.globe.ringsData(this.activeQuakes);
+  onNewQuake(maxMag)
+  {
+    this.activeQuakes.sort((a, b) =>
+    {
+      return a.quakeTime < b.quakeTime;
+    });
+
+    const now = Date.now();
+    let html = ["<table><tr><th>Where</th><th>When</th><th>Mag</th></tr>"];
+    this.activeQuakes = this.activeQuakes.filter((q) => 
+    {
+      let delta = now - q.staleTime;
+      let live = delta <= 0;
+      if(!live)
+      {
+        console.log(`${q.event.properties.place} stale ${q.time} ${delta/1000}`);
+        this.Emit("QuakeOff", q.event);
+      }
+      else
+      {
+        let loc =`<a id='${q.lat}_${q.lng}_${q.event.id}' href=''>${q.event.properties.place}</a>`;
+        let time = q.time;
+        let mag = q.event.properties.mag.toFixed(1);
+        html.push(`<tr><td>${loc}</td><td>${time}</td><td>${mag}</td></tr>`);
+      }
+      return live;
+    });
+    html.push("<tr><td></td><td></td><td style='font-size:2.5em'><a id='fixup' href=''>⥀</a></td></tr>");
+    html.push("</table>")
+    this.infodiv.innerHTML = html.join("");
+    for(let el of this.infodiv.querySelectorAll("a"))
+    {
+      el.onclick = (evt) =>
+      {
+        let [lat, lng, id] = el.id.split("_");
+        if(lat == "fixup")
+          this.rightTheShip();
+        else
+          this.flyTo(lat, lng, id);
+        evt.preventDefault();
+      };
     }
+    if(this.initialCam == null)
+    {
+      let q = this.activeQuakes[0];
+      if(q)
+      {
+        this.initialCam = false;
+        this.flyTo(q.lat, q.lng, q.event.id, 2500);
+      }
+    }
+    this.Emit("Alert", maxMag);
+    this.globe.ringsData(this.activeQuakes);
   }
 
   /* ---------------------------------------------------------- */
-  /*
-      usgs: {
-        id: event.id,
-        magnitude: event.properties.mag,
-        sig: event.properties.sig,
-        place: event.properties.place,
-        time: quakeDate.toLocaleString(),
-        depth // km
-      },
-  */
   earthquakeArrived(event)
   {
     const [longitude, latitude, depth] = event.geometry.coordinates;
@@ -113,7 +134,7 @@ export class Rumble
     let quakeDate = new Date(event.properties.time);
     let quakeTime = quakeDate.getTime(); // ms
     let staleTime = quakeTime + this.lifetimeMillis(event.properties.mag);
-    this.activeQuakes.push(
+    const q = 
     {
       event, 
       time: quakeDate.toLocaleTimeString(),
@@ -126,7 +147,9 @@ export class Rumble
       maxR: radius, // expressed in angular degrees
       propagationSpeed: 1,
       repeatPeriod: 500, // ms
-    });
+    };
+    this.activeQuakes.push(q);
+    this.Emit("QuakeOn", event);
   }
 
   sigToHue(sig)
@@ -180,29 +203,134 @@ export class Rumble
     return Math.max(2, scale * radiusMiles * 360 / earthCircumferenceMiles);
   }
 
-  flyTo(lat, lng, duration = 1000)
+  flyTo(lat, lng, id, duration = 1000, targetDistance = null)
   {
-    let {globe, camera, three} = this;
-    console.log(`flyto: ${lat} ${lng}`);
+    this.Emit("FlyTo", {lat, lng, id});
+    let {globe, camera, trackball, three} = this;
     const p = globe.getCoords(lat, lng, 1);
     const target = new three.Vector3(p.x, p.y, p.z).normalize();
+
+    // Camera direction from the globe center.
     const cameraDirection = camera.position.clone().normalize();
+
     // Target in world coordinates.
-    const worldTarget = target.clone().applyQuaternion(globe.quaternion);
+    const worldTarget = target.clone()
+      .applyQuaternion(globe.quaternion);
 
     // Rotation axis for the shortest great-circle rotation.
-    const axis = new three.Vector3().crossVectors(worldTarget, cameraDirection);
+    const axis = new three.Vector3()
+      .crossVectors(worldTarget, cameraDirection);
+
     const axisLength = axis.length();
 
     // Already centered.
-    if (axisLength < 1e-6) return;
+    if (axisLength < 1e-6)
+      return;
 
     axis.normalize();
 
     const angle = Math.acos(
-      three.MathUtils.clamp(worldTarget.dot(cameraDirection), -1, 1));
+      three.MathUtils.clamp(
+        worldTarget.dot(cameraDirection),
+        -1,
+        1));
 
     const startQuaternion = globe.quaternion.clone();
+    const startDistance = camera.position.distanceTo(trackball.target);
+
+    // If no target distance was supplied, preserve the current distance.
+    const endDistance =
+      targetDistance === null
+        ? startDistance
+        : targetDistance;
+  
+    const startTime = performance.now();
+  
+    function animate(now)
+    {
+      const t = Math.min(1, (now - startTime) / duration);
+
+      // Smoothstep.
+      const s = t * t * (3 - 2 * t);
+
+      // Rotate globe.
+      const rotation = new three.Quaternion()
+        .setFromAxisAngle(axis, angle * s);
+
+      globe.quaternion
+        .copy(startQuaternion)
+        .premultiply(rotation);
+
+      // Change camera distance.
+      const distance =
+        startDistance + (endDistance - startDistance) * s;
+
+      camera.position
+        .normalize()
+        .multiplyScalar(distance);
+
+      if (t < 1)
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  // rightTheShip() works by rotating the globe, not the camera. 
+  rightTheShip(duration = 1200)
+  {
+    let {globe, camera, trackball, three} = this;
+
+    const viewAxis = camera.position.clone()
+      .sub(trackball.target)
+      .normalize();
+
+    // North pole in world coordinates.
+    const north = new three.Vector3(0, 1, 0)
+      .applyQuaternion(globe.quaternion)
+      .normalize();
+
+    // Project north onto the viewing plane.
+    const northProjected = north.clone()
+      .sub(viewAxis.clone().multiplyScalar(north.dot(viewAxis)));
+
+    // Ill-defined when looking directly at a pole.
+    if (northProjected.lengthSq() < 1e-6)
+      return;
+
+    northProjected.normalize();
+
+    // Camera's current "up" direction in world coordinates.
+    const screenUp = new three.Vector3(0, 1, 0)
+      .applyQuaternion(camera.quaternion)
+      .normalize();
+
+    // Project screen-up onto the viewing plane.
+    const screenUpProjected = screenUp.clone()
+      .sub(viewAxis.clone().multiplyScalar(screenUp.dot(viewAxis)));
+
+    screenUpProjected.normalize();
+
+    // Calculate the signed roll angle.
+    const cross = new three.Vector3()
+      .crossVectors(northProjected, screenUpProjected);
+
+    const angle = Math.atan2(
+      viewAxis.dot(cross),
+      northProjected.dot(screenUpProjected)
+    );
+
+    // Nothing to do.
+    if (Math.abs(angle) < 1e-6)
+      return;
+
+    const rotation = new three.Quaternion()
+      .setFromAxisAngle(viewAxis, angle);
+
+    const startQuaternion = globe.quaternion.clone();
+    const targetQuaternion = rotation.clone()
+      .multiply(startQuaternion);
+
     const startTime = performance.now();
 
     function animate(now)
@@ -212,9 +340,10 @@ export class Rumble
       // Smoothstep.
       const s = t * t * (3 - 2 * t);
 
-      const rotation = new three.Quaternion().setFromAxisAngle(axis, angle * s);
-
-      globe.quaternion.copy(startQuaternion).premultiply(rotation);
+      globe.quaternion.copy(startQuaternion).slerp(
+        targetQuaternion,
+        s
+      );
 
       if (t < 1)
         requestAnimationFrame(animate);

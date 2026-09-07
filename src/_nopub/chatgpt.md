@@ -1,4 +1,4 @@
-# Earquake Sonfication via WebAudio
+# Earthquake Sonification via WebAudio
 
 For an earthquake sonification, I’d avoid thinking of it as simply 
 “a very low oscillator.” A convincing rumble usually comes from 

@@ -1,47 +1,6 @@
 import {Rumble} from "./rumble.js";
 import { HzBridge } from "./hzbridge.js";
-
-const hzSoundScript = `
-const IPC = SandboxCtx.IPC;
-IPC.On("QuakeMsg", (msg) =>
-{
-  console.log("QuakeMsg: " + JSON.stringify(msg));
-});
-
-let scene = await Ascene.BeginFiber(this);
-let dac = scene.GetDAC();
-dac.Show();
-
-let inst = await Anode.New("Hz.Noise", {
-  preset: {
-    Waveform: 1,
-    Gain: .3,
-    A: .5,
-    D: .01,
-    S: 1,
-    R: .5,
-  }});
-inst.Show();
-
-let scope = await Anode.New("Hz.Scope");
-scope.Show();
-
-let sscope = await Anode.New("Hz.SpectreScope");
-sscope.Show();
-
-scene.Chain(inst, scope, sscope, dac);
-
-const noteDur = scene.Seconds(1);
-for (let i = 0;i < 30;i++)
-{
-  inst.Note(i, Random.InRange(.5, 1), noteDur);
-  await scene.Wait(2 * noteDur);
-}
-`;
-
-const hzToggleScript = `
-globalThis.Aengine.ToggleState();
-`;
+import { QuakeSonify, RunQuakeSonify } from "./sonify.js";
 
 export class App
 {
@@ -58,31 +17,69 @@ export class App
     this.rumble = new Rumble(this.globe, 
                   this.THREE, this.camera, 
                   this.trackball, this.quakeInfo);
-
     this.redrawCB = this.redraw.bind(this);
     this.redraw();
 
     window.App = this;
-
     this.soundActivated = false;
-
+    this.pendingQuakes = [];
     this.hzbridge.On("HzSbActivate", (onoff) =>
     {
       if(this.soundActivated == false)
       {
-        this.onIdle();
-        this.hzbridge.EvalScript(hzSoundScript);
+        let fstr = QuakeSonify.toString() + RunQuakeSonify.toString();
+        this.hzbridge.EvalScript(fstr);
         this.soundActivated = true;
       }
-      else
-        this.hzbridge.EvalScript(hzToggleScript);
     });
-  }
 
-  onIdle()
-  {
-    this.hzbridge.Notify("QuakeMsg", {msg: "idle", now: (new Date()).toISOString()});
-    setTimeout(this.onIdle.bind(this), 2000);
+    this.hzbridge.On("QuakeSonifyReady", (msg) =>
+    {
+      console.log("Sonify ready!");
+      for(let q of this.pendingQuakes)
+        this.hzbridge.Notify("QuakeMsg", {type: "QuakeOn", quake: q});
+      this.pendingQuakes = [];
+    });
+
+    this.rumble.On("QuakeOn", (q) =>
+    {
+      if(this.soundActivated)
+        this.hzbridge.Notify("QuakeMsg", {type: "QuakeOn", quake: q});
+      else
+        this.pendingQuakes.push(q);
+    });
+    this.rumble.On("QuakeOff", (q) =>
+    {
+      if(!this.soundActivated) return;
+      this.hzbridge.Notify("QuakeMsg", {type: "QuakeOff", quake: q});
+    });
+    this.rumble.On("Alert", (maxmag) =>
+    {
+      if(!this.soundActivated) return;
+      this.hzbridge.Notify("QuakeMsg", {type: "Alert", maxmag});
+    });
+    this.rumble.On("SimQuake", (mag, lat, lng, sig=300) =>
+    {
+      const now = Date.now();
+      const event = {
+        id: `id${now}`,
+        geometry: {
+          coordinates: [lng, lat, Math.random() * 10]
+        },
+        properties: {
+          mag,
+          time: now,
+          sig: sig,
+          place: "10 klicks away from No Place, WA."
+        }
+      };
+      this.rumble.earthquakeArrived(event);
+      this.rumble.onNewQuake(mag);
+    });
+    this.rumble.On("FlyTo", (info) =>
+    {
+      console.log("flyto", Object.keys(info));
+    });
   }
 
   async FetchLocalFile(fileref, filetype="text")
@@ -136,7 +133,7 @@ export class App
     this.camera = new this.THREE.PerspectiveCamera();
     this.camera.aspect = window.innerWidth/window.innerHeight;
     this.camera.updateProjectionMatrix();
-    this.camera.position.z = 500;
+    this.camera.position.z = 200;
 
     // Add camera controller
     this.trackball = new this.TrackballControls(this.camera, this.renderer.domElement);
