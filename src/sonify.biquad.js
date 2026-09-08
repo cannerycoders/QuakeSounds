@@ -109,7 +109,7 @@ export async function *QuakeSonify(ctx)
   const showNoiseMix = true;
   const showNoiseVoice = false;
   const showAlert = false;
-  const showGraph = false;
+  const showGraph = true;
 
   const skipNoise = false;
   const skipOsc = false;
@@ -224,14 +224,14 @@ export async function *QuakeSonify(ctx)
     let q;
     if(quakeCtx.inactiveQuakes.length == 0)
     {
-      let noise, f1, f2, f3, mix;
+      let noise, l1, l2, l3, f1, f2, f3, mix;
       if(!skipNoise)
       {
         noise = await Anode.New("Hz.Noise", {
           acfg: {mode: "mono"},
           preset: {
             Waveform: 2, // brown
-            Gain: 0.1, // three routes to dac
+            Gain: 0.1, // three routes to dac, depends on resonance.
             A: 3,
             D: .01,
             S: 1,
@@ -239,37 +239,52 @@ export async function *QuakeSonify(ctx)
           }
         });
 
-        const LFO = 1; // 
-        f1 = await scene.NewAnode("Hz.Filter", {
+        l1 = await scene.NewAnode("Hz.LFO", {
+          preset: {
+            RunMode: 1, // means generate a lfo
+            OutMin: -5,
+            OutMax: 5,
+            Rate: .1
+          }
+        });
+        f1 = await scene.NewAnode("Hz.Biquad", {
           preset: {
             Type: 2, // bandpass
             Frequency: 50,
-            Resonance: .8,
-            Mix: 1,
-            LFO,
-            LFORate: .1,
-            LFORange: 10,
-          }});
-        f2 = await scene.NewAnode("Hz.Filter", {
+            Resonance: 12,
+          }
+        });
+
+        l2 = await scene.NewAnode("Hz.LFO", {
+          preset: {
+            RunMode: 1, // means generate a lfo
+            OutMin: -2.5,
+            OutMax: 2.5,
+            Rate: .2
+          }
+        });
+        f2 = await scene.NewAnode("Hz.Biquad", {
           preset: {
             Type: 2, // bandpass
             Frequency: 90,
-            Resonance: .8,
-            Mix: 1,
-            LFO,
-            LFORate: .2,
-            LFORange: 5,
+            Resonance: 18,
           }});
-        f3 = await scene.NewAnode("Hz.Filter", {
+
+        l3 = await scene.NewAnode("Hz.LFO", {
+          preset: {
+            RunMode: 1, // means generate a lfo
+            OutMin: -10,
+            OutMax: 10,
+            Rate: .125
+          }
+        });
+        f3 = await scene.NewAnode("Hz.Biquad", {
           preset: {
             Type: 0, // lowpass
             Frequency: 200,
-            Resonance: 0.5, 
-            Mix: 1,
-            LFO,
-            LFORate: .12,
-            LFORange: 5,
+            Resonance: 5,
           }});
+
         mix = await scene.NewAnode("Hz.Mix", {
           acfg: {mode: "1to2"},
           preset: {
@@ -278,6 +293,11 @@ export async function *QuakeSonify(ctx)
           }});
         if(showNoiseVoice)
           mix.Show();
+
+        scene.ModulateParam(l1, f1, "Frequency");
+        scene.ModulateParam(l2, f2, "Frequency");
+        scene.ModulateParam(l3, f3, "Frequency");
+
         scene.Chain(noise, f1, mix);
         scene.Chain(noise, f2, mix);
         scene.Chain(noise, f3, mix);
