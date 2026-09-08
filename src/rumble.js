@@ -73,13 +73,12 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
 
   onNewQuake(maxMag)
   {
+    const now = Date.now();
+    let html = ["<table><tr><th>Where</th><th>When</th><th>Mag</th><th>Sig</th></tr>"];
     this.activeQuakes.sort((a, b) =>
     {
-      return a.quakeTime < b.quakeTime;
+      return a.quakeTime - b.quakeTime;
     });
-
-    const now = Date.now();
-    let html = ["<table><tr><th>Where</th><th>When</th><th>Mag</th></tr>"];
     this.activeQuakes = this.activeQuakes.filter((q) => 
     {
       let delta = now - q.staleTime;
@@ -94,7 +93,8 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
         let loc =`<a id='${q.lat}_${q.lng}_${q.event.id}' href=''>${q.event.properties.place}</a>`;
         let time = q.time;
         let mag = q.event.properties.mag.toFixed(1);
-        html.push(`<tr><td>${loc}</td><td>${time}</td><td>${mag}</td></tr>`);
+        let sig = q.event.properties.sig;
+        html.push(`<tr><td>${loc}</td><td>${time}</td><td>${mag}</td><td>${sig}</td></tr>`);
       }
       return live;
     });
@@ -154,7 +154,7 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
 
   sigToHue(sig)
   {
-    let x = Math.min(1, sig/1000);
+    let x = Math.min(1, sig/700);
     return 240 * (1 - x); // blue is 240 red is 0
   }
 
@@ -186,7 +186,7 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
     return scale * 7.2 * Math.pow(2, magnitude - 7);
   }
 
-  magDepthToRadiusDegrees(magnitude, depthKm, scale=5)
+  magDepthToRadiusDegrees(magnitude, depthKm, scale=1)
   {
     const earthCircumferenceMiles = 24901;
     const radiusAtM7Miles = 500;
@@ -200,7 +200,7 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
     // surface influence.
     const depthFactor = 1 / Math.sqrt(1 + depthKm / 20);
     const radiusMiles = magnitudeRadius * depthFactor;
-    return Math.max(2, scale * radiusMiles * 360 / earthCircumferenceMiles);
+    return Math.max(1, scale * radiusMiles * 360 / earthCircumferenceMiles);
   }
 
   flyTo(lat, lng, id, duration = 1000, targetDistance = null)
