@@ -13,6 +13,7 @@ export class App
     document.body.classList.toggle("touch", this.isTouchDevice);
     if(this.isTouchDevice) return;
 
+    document.body.classList.remove("loading");
     this.hzbridge = new HzBridge(document.getElementById("hzbridge"));
 
     this.THREE = THREE;
@@ -75,8 +76,6 @@ export class App
 
       this.soundActivated = false;
       this.pendingQuakes = [];
-
-      document.body.classList.remove("loading");
     });
 
     this.hzbridge.On("HzSbActivate", (onoff) =>
