@@ -4,7 +4,7 @@
 </p>
 
 `QuakeSounds` produces an ambient soundscape representing the live earthquakes as provided by the USGS earthquake hazards program.
-It can be used as a comforting and sometimes alarming background  your daily grind.
+It can be used as a comforting and sometimes alarming background in your daily grind.
 
 `QuakeSounds` requires big speakers and therefore isn't suitable for running on mobile devices.
 
