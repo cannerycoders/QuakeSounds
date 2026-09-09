@@ -8,8 +8,8 @@
 import {HzSbCtx} from "./hzsbctx.js";
 import {HzEventHub} from "./hzeventhub.js";
 
-const sbURL = "http://localhost:8081/sandbox/index.html?sbId=0";
-// const sbURL = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html?sbId=0";
+// const sbURL = "http://localhost:8081/sandbox/index.html?sbId=0";
+const sbURL = "https://cannerycoders.com/apps/HzWeb/sandbox/index.html?sbId=0";
 
 export class HzBridge extends HzEventHub
 {
@@ -20,7 +20,9 @@ export class HzBridge extends HzEventHub
     this.sandboxes = [];
 
     this.iframeDiv.innerHTML = `
-    <iframe style="border-style:none" tabindex="10" sandbox="allow-same-origin allow-scripts"></iframe>
+    <iframe style="border-style:none" tabindex="10" 
+     sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox">
+    </iframe>
     `;
 
     this.iframe = this.iframeDiv.querySelector("iframe");

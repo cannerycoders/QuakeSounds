@@ -9,6 +9,10 @@ export class App
   {
     window.App = this;
 
+    this.isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    document.body.classList.toggle("touch", this.isTouchDevice);
+    if(this.isTouchDevice) return;
+
     this.hzbridge = new HzBridge(document.getElementById("hzbridge"));
 
     this.THREE = THREE;
@@ -71,6 +75,8 @@ export class App
 
       this.soundActivated = false;
       this.pendingQuakes = [];
+
+      document.body.classList.remove("loading");
     });
 
     this.hzbridge.On("HzSbActivate", (onoff) =>
@@ -139,8 +145,8 @@ export class App
   {
     this.globe = new this.ThreeGlobe();
     return Promise.all([
-      new this.THREE.TextureLoader().loadAsync("/img/8k_earth_daymap.jpg"),
-      new this.THREE.TextureLoader().loadAsync("/img/8k_earth_nightmap.jpg"),
+      new this.THREE.TextureLoader().loadAsync("./img/8k_earth_daymap.jpg"),
+      new this.THREE.TextureLoader().loadAsync("./img/8k_earth_nightmap.jpg"),
     ]).then(([dayTexture, nightTexture]) => {
       this.globeMaterial = new this.THREE.ShaderMaterial({
         uniforms: {

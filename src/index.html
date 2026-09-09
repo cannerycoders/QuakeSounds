@@ -6,7 +6,34 @@
     margin: 0;
     overflow: hidden;
     background: #000;
+    font-size: clamp(15px, 1.5vw, 18px);
+    color: #aaa;
   }
+
+  body.loading .TouchOnly {
+    display: flex;
+  }
+
+  body.loading .DesktopOnly {
+    display: none;
+  }
+
+  /* After initialization */
+  body:not(.loading):not(.touch) .TouchOnly {
+    display: none;
+  }
+
+  body.touch .DesktopOnly {
+    display: none;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 5vw, 3rem);
+  }
+  h2 {
+    font-size: clamp(1.4rem, 3.5vw, 2rem);
+  }
+
   a {
     text-decoration: none;
   }
@@ -37,11 +64,13 @@
     width: 100%;
   }
   #logo {
-    width: 200px;
+    max-width: 300px;
+    widtH: 25%;
     position: absolute;
     top: 5px;
     left: 5px;
     opacity: .75;
+    border-radius: 4%;
   }
   table {
     color: #aaa;
@@ -64,11 +93,21 @@
 
 </head>
 
-<body>
-  <div id="globeViz"></div>
-  <div id="quakeInfo"></div>
-  <div id="hzbridge"></div>
-  <img id="logo" src="img/quakesounds.jpg">
+<body class="loading">
+  <div class="App">
+    <div class="DesktopOnly" id="globeViz"></div>
+    <div class="DesktopOnly" id="quakeInfo"></div>
+    <div class="DesktopOnly" id="hzbridge"></div>
+    <img class="DesktopOnly" id="logo" src="img/quakesounds.jpg">
+  </div>
+
+  <div class="TouchOnly">
+    <div style="text-align:center;padding-top:30px">
+      <img src="img/quakesounds.jpg" style="border-radius:10px;width:90%">
+      <h1>QuakeSounds requires big speakers.</h1>
+    </div>
+  </div>
+
   <script type="module" src="./index.js"></script>
 
 </body>

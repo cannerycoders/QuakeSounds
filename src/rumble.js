@@ -77,7 +77,7 @@ export class Rumble extends HzEventHub // we emit QuakeOn, QuakeOff, FlyTo
     let html = ["<table><tr><th>Where</th><th>When</th><th>Mag</th><th>Sig</th></tr>"];
     this.activeQuakes.sort((a, b) =>
     {
-      return a.quakeTime - b.quakeTime;
+      return b.quakeTime - a.quakeTime; // newest to oldest
     });
     this.activeQuakes = this.activeQuakes.filter((q) => 
     {

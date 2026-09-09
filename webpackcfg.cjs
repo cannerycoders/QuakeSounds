@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const { LicenseWebpackPlugin } = require("license-webpack-plugin");
 
 module.exports = (env, argv) =>
 {
@@ -40,11 +41,21 @@ module.exports = (env, argv) =>
           },
         ],
       }),
+      new LicenseWebpackPlugin({
+        outputFilename: "index.js.LICENSE2.txt",
+        perChunkOutput: false,
+        addBanner: false
+      }),
     ],
 
     devtool: isProduction ? false : "source-map",
     optimization: {
-      minimize: isProduction
+      minimize: isProduction,
+      // minimizer: [
+      //   new TerserPlugin({
+      //     extractComments: false,
+      //   })
+      // ],
     }
   }
 };
