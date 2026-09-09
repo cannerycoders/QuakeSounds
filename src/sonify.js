@@ -153,7 +153,7 @@ async function *QuakeSonify(sbctx)
     }
   });
   let oscmix = await Anode.New("Hz.Mix", {
-    name: "ToneGain",
+    name: "Tone",
     preset: {
       Gain: .14 
     }
@@ -163,7 +163,7 @@ async function *QuakeSonify(sbctx)
     oscmix.Show();
 
   let qmix = await Anode.New("Hz.Mix", {
-    name: "RumbleGain",
+    name: "Rumble",
     preset: {
       Gain: 2.5
     }
