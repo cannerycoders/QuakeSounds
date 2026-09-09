@@ -1,6 +1,6 @@
 // nb: within QuakeSonify, "this" refers to the function object
 // and not the fiber context object.
-export async function *QuakeSonify(ctx)
+async function *QuakeSonify(sbctx)
 {
   /* ------------------------------------------------------ */
   // this class is used to serialize incoming IPC requests.
@@ -116,7 +116,7 @@ export async function *QuakeSonify(ctx)
 
   // console.log("Running QuakeSonify");
 
-  let scene = await Ascene.BeginFiber(ctx);
+  let scene = await Ascene.BeginFiber(sbctx);
   let dac = scene.GetDAC();
   await dac.LoadPreset({
     Gain: .6
@@ -377,15 +377,16 @@ export async function *QuakeSonify(ctx)
     await scene.Wait(scene.Seconds(10));
     // console.log("sonify tick...");
   }
-
 }
+
+const src = QuakeSonify.toString();
+
 // we take this approach in order to get full IDE feedback
 // on the function above.  Alternative is to return it as a 
 // raw code-block.
 export const RunQuakeSonify = `
-  let gen = QuakeSonify(this/*fiberctx*/);
-  for await (const val of gen)
-  {
+  let fn = (${src});
+
+  for await (const val of fn(this))
     yield;
-  }
 `

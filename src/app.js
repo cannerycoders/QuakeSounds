@@ -1,6 +1,6 @@
 import {Rumble} from "./rumble.js";
 import { HzBridge } from "./hzbridge.js";
-import { QuakeSonify, RunQuakeSonify } from "./sonify.js";
+import { RunQuakeSonify } from "./sonify.js";
 import { DayNightShader } from "./daynightshader.js";
 
 export class App
@@ -14,7 +14,6 @@ export class App
     this.THREE = THREE;
     this.ThreeGlobe = ThreeGlobe;
     this.TrackballControls = TrackballControls;
-
     this.solar = solar;
 
     this.initGlobe()
@@ -78,8 +77,7 @@ export class App
     {
       if(this.soundActivated == false)
       {
-        let fstr = QuakeSonify.toString() + RunQuakeSonify.toString();
-        this.hzbridge.EvalScript(fstr);
+        this.hzbridge.EvalScript(RunQuakeSonify);
         this.soundActivated = true;
       }
     });
