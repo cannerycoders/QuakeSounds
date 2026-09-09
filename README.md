@@ -16,7 +16,7 @@ It can be used as a comforting and sometimes alarming background in your daily g
 
 ## credits
 
-`QuakeSounds` was built by [Cannery Coders](https://cannerycoders.com). It leverages the open-source packages,  `global-three` and `three.js`.
+`QuakeSounds` was built by [Cannery Coders](https://cannerycoders.com). It leverages the open-source packages,  `three-globe` and `Three.js`.
 
 `USGS` offers valuable services courtesy of the US Government.
 
