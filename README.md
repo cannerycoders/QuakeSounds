@@ -1,10 +1,13 @@
 
-<p align="center">
-  <img src="src/img/quakesounds.jpg" alt="QuakeSounds Logo" width="500">
-</p>
+<img src="src/img/quakesounds.jpg" alt="QuakeSounds Logo" width="500">
+
+
+[QuakeSounds Live](https://cannerycoders.github.io/QuakeSounds/)
+
+## info
 
 `QuakeSounds` produces an ambient soundscape representing the live earthquakes as provided by the USGS earthquake hazards program.
-It can be used as a comforting and sometimes alarming background  your daily grind.
+It can be used as a comforting and sometimes alarming background in your daily grind.
 
 `QuakeSounds` requires big speakers and therefore isn't suitable for running on mobile devices.
 
@@ -13,10 +16,10 @@ It can be used as a comforting and sometimes alarming background  your daily gri
 
 ## credits
 
-`QuakeSounds` is build atop the `global-three` and `three.js` projects.
+`QuakeSounds` was built by [Cannery Coders](https://cannerycoders.com). It leverages the open-source packages,  `global-three` and `three.js`.
 
-`USGS` is a valued service-provider of the US Government.
+`USGS` offers valuable services courtesy of the US Government.
 
 ## caveats
 
-See LICENSE.md.
+See [LICENSE.md](LICENSE.md).
